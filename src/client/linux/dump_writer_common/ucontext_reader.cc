@@ -254,6 +254,57 @@ void UContextReader::FillCPUContext(RawContextCPU* out, const ucontext_t* uc) {
   out->float_save.fir = uc->uc_mcontext.fpc_eir;  // Unused.
 #endif
 }
+
+#elif defined(__e2k__)
+
+#define E2K_PCSHTP_SIZE 11
+#define E2K_PSHTP_SIZE 12
+
+uintptr_t UContextReader::GetStackPointer(const ucontext_t* uc) {
+  return uc->uc_mcontext.usd_lo & 0xffffffffffff; // [rwap base [47: 0]
+}
+
+/* It's not stack pointer, just stack base to copy mapping. */
+uintptr_t UContextReader::GetInstructionPointer(const ucontext_t* uc) {
+  return uc->uc_mcontext.cr0_hi;
+}
+
+void UContextReader::FillCPUContext(RawContextCPU* out, const ucontext_t* uc,
+                                    const struct user_regs_struct *regs) {
+  out->context_flags = MD_CONTEXT_E2K_FULL;
+  out->usbr = uc->uc_mcontext.sbr;
+  out->usd_lo = uc->uc_mcontext.usd_lo;
+  out->usd_hi = uc->uc_mcontext.usd_hi;
+  out->psp_lo = uc->uc_mcontext.psp_lo;
+  out->psp_hi = uc->uc_mcontext.psp_hi;
+  out->cr0_lo = uc->uc_mcontext.cr0_lo;
+  out->cr0_hi = uc->uc_mcontext.cr0_hi;
+  out->cr1_lo = uc->uc_mcontext.cr1_lo;
+  out->cr1_hi = uc->uc_mcontext.cr1_hi;
+  out->pcsp_lo = uc->uc_mcontext.pcsp_lo;
+  out->pcsp_hi = uc->uc_mcontext.pcsp_hi;
+  out->ctpr1 = uc->uc_extra.ctpr1;
+  out->ctpr2 = uc->uc_extra.ctpr2;
+  out->ctpr3 = uc->uc_extra.ctpr3;
+
+  // Get from user_regs
+  out->pshtp = regs->pshtp;
+  out->pcshtp = regs->pcshtp;
+  for (int i = 0; i < MD_CONTEXT_E2K_GREGS_COUNT; ++i)
+    out->g[i] = regs->g[i];
+
+  /* Get chain stack pointer pcsp_lo(base) + pcsp_hi(ind) + signed(pcshtp) */
+  out->pcs = (uc->uc_mcontext.pcsp_lo & 0xffffffffffff) +
+             (uc->uc_mcontext.pcsp_hi & 0xffffffff) +
+             ((uint64_t) (((int64_t) (regs->pcshtp) <<
+             (64 - E2K_PCSHTP_SIZE)) >> (64 - E2K_PCSHTP_SIZE)));
+  /* Get procedure stack pointer psp_lo(base) + psp_hi(ind) + 2 * signed(pshtp) */
+  out->ps = (uc->uc_mcontext.psp_lo & 0xffffffffffff) +
+            (uc->uc_mcontext.psp_hi & 0xffffffff) +
+            2 * ((uint64_t) (((int64_t) (regs->pshtp) <<
+            (64 - E2K_PSHTP_SIZE)) >> (64 - E2K_PSHTP_SIZE)));
+}
+
 #endif
 
 }  // namespace google_breakpad

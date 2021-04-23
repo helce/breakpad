@@ -270,7 +270,49 @@ void ThreadInfo::FillCPUContext(RawContextCPU* out) const {
   out->float_save.fir = mcontext.fpc_eir;
 #endif
 }
-#endif  // __mips__
+
+#elif defined(__e2k__)
+
+#define E2K_PCSHTP_SIZE 11
+#define E2K_PSHTP_SIZE 12
+
+/* Regular instruction pointer */
+uintptr_t ThreadInfo::GetInstructionPointer() const {
+  return regs.ip;
+}
+
+void ThreadInfo::FillCPUContext(RawContextCPU* out) const {
+  out->context_flags = MD_CONTEXT_E2K_FULL;
+  for (int i = 0; i < MD_CONTEXT_E2K_GREGS_COUNT; ++i)
+    out->g[i] = regs.g[i];
+  out->usbr = regs.usbr;
+  out->usd_lo = regs.usd_lo;
+  out->usd_hi = regs.usd_hi;
+  out->psp_lo = regs.psp_lo;
+  out->psp_hi = regs.psp_hi;
+  out->pshtp = regs.pshtp;
+  out->cr0_lo = regs.cr0_lo;
+  out->cr0_hi = regs.cr0_hi;
+  out->cr1_lo = regs.cr1_lo;
+  out->cr1_hi = regs.cr1_hi;
+  out->pcsp_lo = regs.pcsp_lo;
+  out->pcsp_hi = regs.pcsp_hi;
+  out->pcshtp = regs.pcshtp;
+  out->ctpr1 = regs.ctpr1;
+  out->ctpr2 = regs.ctpr2;
+  out->ctpr3 = regs.ctpr3;
+
+  /* Get chain stack pointer pcsp_lo(base) + pcsp_hi(ind) + signed(pcshtp) */
+  out->pcs = (regs.pcsp_lo & 0xffffffffffff) + (regs.pcsp_hi & 0xffffffff) +
+             ((uint64_t) (((int64_t) (regs.pcshtp) <<
+             (64 - E2K_PCSHTP_SIZE)) >> (64 - E2K_PCSHTP_SIZE)));
+  /* Get procedure stack pointer psp_lo(base) + psp_hi(ind) + 2 * signed(pshtp) */
+  out->ps = (regs.psp_lo & 0xffffffffffff) + (regs.psp_hi & 0xffffffff) +
+            2 * ((uint64_t) (((int64_t) (regs.pshtp) <<
+            (64 - E2K_PSHTP_SIZE)) >> (64 - E2K_PSHTP_SIZE)));
+}
+  
+#endif
 
 void ThreadInfo::GetGeneralPurposeRegisters(void** gp_regs, size_t* size) {
   assert(gp_regs || size);
@@ -280,6 +322,9 @@ void ThreadInfo::GetGeneralPurposeRegisters(void** gp_regs, size_t* size) {
   if (size)
     *size = sizeof(mcontext.gregs);
 #else
+#if defined(__e2k__)
+  regs.sizeof_struct = sizeof(regs);
+#endif
   if (gp_regs)
     *gp_regs = &regs;
   if (size)
@@ -294,6 +339,9 @@ void ThreadInfo::GetFloatingPointRegisters(void** fp_regs, size_t* size) {
     *fp_regs = &mcontext.fpregs;
   if (size)
     *size = sizeof(mcontext.fpregs);
+#elif defined(__e2k__)
+  /* No special fpregs for e2k */
+  return;
 #else
   if (fp_regs)
     *fp_regs = &fpregs;

@@ -55,6 +55,7 @@
 #include "processor/stackwalker_arm.h"
 #include "processor/stackwalker_arm64.h"
 #include "processor/stackwalker_mips.h"
+#include "processor/stackwalker_e2k.h"
 
 namespace google_breakpad {
 
@@ -198,6 +199,8 @@ Stackwalker* Stackwalker::StackwalkerForCPU(
     const SystemInfo* system_info,
     DumpContext* context,
     MemoryRegion* memory,
+    MemoryRegion* chain_stack,
+    MemoryRegion* procedure_stack,
     const CodeModules* modules,
     const CodeModules* unloaded_modules,
     StackFrameSymbolizer* frame_symbolizer) {
@@ -264,6 +267,14 @@ Stackwalker* Stackwalker::StackwalkerForCPU(
                                              context->GetContextARM64(),
                                              memory, modules,
                                              frame_symbolizer);
+      break;
+
+    case MD_CONTEXT_E2K:
+      cpu_stackwalker = new StackwalkerE2K(system_info,
+                                           context->GetContextE2K(),
+                                           memory, chain_stack,
+                                           procedure_stack, modules,
+                                           frame_symbolizer);
       break;
   }
 

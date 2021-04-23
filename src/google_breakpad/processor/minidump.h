@@ -284,6 +284,8 @@ class MinidumpThread : public MinidumpObject {
   // GetMemory may return NULL even if the MinidumpThread is valid,
   // if the thread memory cannot be read.
   virtual MinidumpMemoryRegion* GetMemory();
+  virtual MinidumpMemoryRegion* GetChainStack();
+  virtual MinidumpMemoryRegion* GetProcedureStack();
   // GetContext may return NULL even if the MinidumpThread is valid.
   virtual MinidumpContext* GetContext();
 
@@ -300,6 +302,8 @@ class MinidumpThread : public MinidumpObject {
   // MinidumpThread is invalid.  Note that this method can be called even when
   // the thread memory cannot be read and GetMemory returns NULL.
   virtual uint64_t GetStartOfStackMemoryRange() const;
+  virtual uint64_t GetStartOfChainStackRange() const;
+  virtual uint64_t GetStartOfProcedureStackRange() const;
 
  protected:
   explicit MinidumpThread(Minidump* minidump);
@@ -315,6 +319,8 @@ class MinidumpThread : public MinidumpObject {
 
   MDRawThread           thread_;
   MinidumpMemoryRegion* memory_;
+  MinidumpMemoryRegion* chain_stack_;
+  MinidumpMemoryRegion* procedure_stack_;
   MinidumpContext*      context_;
 };
 

@@ -77,6 +77,8 @@
   #define ELF_ARCH  EM_MIPS
 #elif defined(__aarch64__)
   #define ELF_ARCH  EM_AARCH64
+#elif defined(__e2k__)
+  #define ELF_ARCH  EM_MCST_ELBRUS
 #endif
 
 #if defined(__arm__)
@@ -325,6 +327,14 @@ struct CrashedProcess {
     uintptr_t stack_addr;
     const uint8_t* stack;
     size_t stack_length;
+#if defined(__e2k__)
+    uintptr_t proc_stack_addr;
+    const uint8_t* proc_stack;
+    size_t proc_stack_length;
+    uintptr_t chain_stack_addr;
+    const uint8_t* chain_stack;
+    size_t chain_stack_length;
+#endif
   };
   std::vector<Thread> threads;
 
@@ -535,6 +545,32 @@ ParseThreadRegisters(CrashedProcess::Thread* thread,
   thread->mcontext.fpc_eir = rawregs->float_save.fir;
 #endif
 }
+#elif defined(__e2k__)
+static void
+ParseThreadRegisters(CrashedProcess::Thread* thread,
+                     const MinidumpMemoryRange& range) {
+  const MDRawContextE2K* rawregs = range.GetData<MDRawContextE2K>(0);
+
+  thread->regs.sizeof_struct = sizeof(struct user_regs_struct);
+  for (int i = 0; i < MD_CONTEXT_E2K_GREGS_COUNT; ++i)
+    thread->regs.g[i] = rawregs->g[i];
+  thread->regs.usbr = rawregs->usbr;
+  thread->regs.usd_lo = rawregs->usd_lo;
+  thread->regs.usd_hi = rawregs->usd_hi;
+  thread->regs.psp_lo = rawregs->psp_lo;
+  thread->regs.psp_hi = rawregs->psp_hi;
+  thread->regs.pshtp = rawregs->pshtp;
+  thread->regs.cr0_lo = rawregs->cr0_lo;
+  thread->regs.cr0_hi = rawregs->cr0_hi;
+  thread->regs.cr1_lo = rawregs->cr1_lo;
+  thread->regs.cr1_hi = rawregs->cr1_hi;
+  thread->regs.pcsp_lo = rawregs->pcsp_lo;
+  thread->regs.pcsp_hi = rawregs->pcsp_hi;
+  thread->regs.pcshtp = rawregs->pcshtp;
+  thread->regs.ctpr1 = rawregs->ctpr1;
+  thread->regs.ctpr2 = rawregs->ctpr2;
+  thread->regs.ctpr3 = rawregs->ctpr3;
+}
 #else
 #error "This code has not been ported to your platform yet"
 #endif
@@ -562,6 +598,18 @@ ParseThreadList(const Options& options, CrashedProcess* crashinfo,
         full_file.Subrange(rawthread->stack.memory);
     thread.stack = stack_range.data();
     thread.stack_length = rawthread->stack.memory.data_size;
+    #if defined(__e2k__)
+    thread.proc_stack_addr = rawthread->proc_stack.start_of_memory_range;
+    MinidumpMemoryRange proc_stack_range =
+        full_file.Subrange(rawthread->proc_stack.memory);
+    thread.proc_stack = proc_stack_range.data();
+    thread.proc_stack_length = rawthread->proc_stack.memory.data_size;
+    thread.chain_stack_addr = rawthread->chain_stack.start_of_memory_range;
+    MinidumpMemoryRange chain_stack_range =
+        full_file.Subrange(rawthread->chain_stack.memory);
+    thread.chain_stack = chain_stack_range.data();
+    thread.chain_stack_length = rawthread->chain_stack.memory.data_size;
+    #endif
 
     ParseThreadRegisters(&thread,
                          full_file.Subrange(rawthread->thread_context));
@@ -623,6 +671,12 @@ ParseSystemInfo(const Options& options, CrashedProcess* crashinfo,
 # else
 #  error "This mips ABI is currently not supported (n32)"
 # endif
+#elif defined(__e2k__)
+  if (sysinfo->processor_architecture != MD_CPU_ARCHITECTURE_E2K) {
+    fprintf(stderr,
+            "This version of minidump-2-core only supports E2K (64bit).\n");
+    exit(1);
+  }
 #else
 #error "This code has not been ported to your platform yet"
 #endif
@@ -650,6 +704,8 @@ ParseSystemInfo(const Options& options, CrashedProcess* crashinfo,
             ? "MIPS"
             : sysinfo->processor_architecture == MD_CPU_ARCHITECTURE_MIPS64
             ? "MIPS64"
+            : sysinfo->processor_architecture == MD_CPU_ARCHITECTURE_E2K
+            ? "E2K"
             : "???",
             sysinfo->number_of_processors,
             sysinfo->processor_level,
@@ -1077,6 +1133,14 @@ AugmentMappings(const Options& options, CrashedProcess* crashinfo,
     AddDataToMapping(crashinfo,
                      string((char*)thread.stack, thread.stack_length),
                      thread.stack_addr);
+    #if defined(__e2k__)
+    AddDataToMapping(crashinfo,
+                     string((char *)thread.proc_stack, thread.proc_stack_length),
+                     thread.proc_stack_addr);
+    AddDataToMapping(crashinfo,
+                     string((char *)thread.chain_stack, thread.chain_stack_length),
+                     thread.chain_stack_addr);
+    #endif
   }
 
   // Create a new link map with information about DSOs. We move this map to

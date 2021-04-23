@@ -102,6 +102,8 @@
         'stackwalker_arm.h',
         'stackwalker_arm64.cc',
         'stackwalker_arm64.h',
+        'stackwalker_e2k.cc',
+        'stackwalker_e2k.h',
         'stackwalker_mips.cc',
         'stackwalker_mips.h',
         'stackwalker_ppc.cc',

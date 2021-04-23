@@ -498,6 +498,8 @@ am__src_libbreakpad_a_SOURCES_DIST =  \
 	src/processor/stackwalker_sparc.h \
 	src/processor/stackwalker_x86.cc \
 	src/processor/stackwalker_x86.h \
+	src/processor/stackwalker_e2k.cc \
+	src/processor/stackwalker_e2k.h \
 	src/processor/static_address_map-inl.h \
 	src/processor/static_address_map.h \
 	src/processor/static_contained_range_map-inl.h \
@@ -547,6 +549,7 @@ am__src_libbreakpad_a_SOURCES_DIST =  \
 @DISABLE_PROCESSOR_FALSE@	src/processor/stackwalker_ppc64.$(OBJEXT) \
 @DISABLE_PROCESSOR_FALSE@	src/processor/stackwalker_sparc.$(OBJEXT) \
 @DISABLE_PROCESSOR_FALSE@	src/processor/stackwalker_x86.$(OBJEXT) \
+@DISABLE_PROCESSOR_FALSE@	src/processor/stackwalker_e2k.$(OBJEXT) \
 @DISABLE_PROCESSOR_FALSE@	src/processor/symbolic_constants_win.$(OBJEXT) \
 @DISABLE_PROCESSOR_FALSE@	src/processor/tokenize.$(OBJEXT)
 src_libbreakpad_a_OBJECTS = $(am_src_libbreakpad_a_OBJECTS)
@@ -983,6 +986,7 @@ src_processor_exploitability_unittest_OBJECTS =  \
 @DISABLE_PROCESSOR_FALSE@	src/processor/stackwalker_ppc64.o \
 @DISABLE_PROCESSOR_FALSE@	src/processor/stackwalker_sparc.o \
 @DISABLE_PROCESSOR_FALSE@	src/processor/stackwalker_x86.o \
+@DISABLE_PROCESSOR_FALSE@	src/processor/stackwalker_e2k.o \
 @DISABLE_PROCESSOR_FALSE@	src/processor/symbolic_constants_win.o \
 @DISABLE_PROCESSOR_FALSE@	src/processor/tokenize.o \
 @DISABLE_PROCESSOR_FALSE@	src/third_party/libdisasm/libdisasm.a \
@@ -1047,6 +1051,7 @@ src_processor_microdump_processor_unittest_OBJECTS =  \
 @DISABLE_PROCESSOR_FALSE@	src/processor/stackwalker_ppc64.o \
 @DISABLE_PROCESSOR_FALSE@	src/processor/stackwalker_sparc.o \
 @DISABLE_PROCESSOR_FALSE@	src/processor/stackwalker_x86.o \
+@DISABLE_PROCESSOR_FALSE@	src/processor/stackwalker_e2k.o \
 @DISABLE_PROCESSOR_FALSE@	src/processor/tokenize.o \
 @DISABLE_PROCESSOR_FALSE@	$(am__DEPENDENCIES_2) \
 @DISABLE_PROCESSOR_FALSE@	$(am__DEPENDENCIES_1) \
@@ -1086,6 +1091,7 @@ src_processor_microdump_stackwalk_OBJECTS =  \
 @DISABLE_PROCESSOR_FALSE@	src/processor/stackwalker_ppc64.o \
 @DISABLE_PROCESSOR_FALSE@	src/processor/stackwalker_sparc.o \
 @DISABLE_PROCESSOR_FALSE@	src/processor/stackwalker_x86.o \
+@DISABLE_PROCESSOR_FALSE@	src/processor/stackwalker_e2k.o \
 @DISABLE_PROCESSOR_FALSE@	src/processor/tokenize.o \
 @DISABLE_PROCESSOR_FALSE@	src/third_party/libdisasm/libdisasm.a
 am__src_processor_minidump_dump_SOURCES_DIST =  \
@@ -1138,6 +1144,7 @@ src_processor_minidump_processor_unittest_OBJECTS =  \
 @DISABLE_PROCESSOR_FALSE@	src/processor/stackwalker_ppc64.o \
 @DISABLE_PROCESSOR_FALSE@	src/processor/stackwalker_sparc.o \
 @DISABLE_PROCESSOR_FALSE@	src/processor/stackwalker_x86.o \
+@DISABLE_PROCESSOR_FALSE@	src/processor/stackwalker_e2k.o \
 @DISABLE_PROCESSOR_FALSE@	src/processor/symbolic_constants_win.o \
 @DISABLE_PROCESSOR_FALSE@	src/processor/tokenize.o \
 @DISABLE_PROCESSOR_FALSE@	src/third_party/libdisasm/libdisasm.a \
@@ -1183,6 +1190,7 @@ src_processor_minidump_stackwalk_OBJECTS =  \
 @DISABLE_PROCESSOR_FALSE@	src/processor/stackwalker_ppc64.o \
 @DISABLE_PROCESSOR_FALSE@	src/processor/stackwalker_sparc.o \
 @DISABLE_PROCESSOR_FALSE@	src/processor/stackwalker_x86.o \
+@DISABLE_PROCESSOR_FALSE@	src/processor/stackwalker_e2k.o \
 @DISABLE_PROCESSOR_FALSE@	src/processor/symbolic_constants_win.o \
 @DISABLE_PROCESSOR_FALSE@	src/processor/tokenize.o \
 @DISABLE_PROCESSOR_FALSE@	src/third_party/libdisasm/libdisasm.a
@@ -1374,6 +1382,7 @@ src_processor_stackwalker_selftest_OBJECTS =  \
 @DISABLE_PROCESSOR_FALSE@	src/processor/stackwalker_ppc64.o \
 @DISABLE_PROCESSOR_FALSE@	src/processor/stackwalker_sparc.o \
 @DISABLE_PROCESSOR_FALSE@	src/processor/stackwalker_x86.o \
+@DISABLE_PROCESSOR_FALSE@	src/processor/stackwalker_e2k.o \
 @DISABLE_PROCESSOR_FALSE@	src/processor/tokenize.o \
 @DISABLE_PROCESSOR_FALSE@	$(am__DEPENDENCIES_1) \
 @DISABLE_PROCESSOR_FALSE@	$(am__DEPENDENCIES_1)
@@ -1864,6 +1873,7 @@ am__depfiles_remade = src/client/$(DEPDIR)/minidump_file_writer.Po \
 	src/processor/$(DEPDIR)/stackwalker_arm64.Po \
 	src/processor/$(DEPDIR)/stackwalker_arm64_unittest-stackwalker_arm64_unittest.Po \
 	src/processor/$(DEPDIR)/stackwalker_arm_unittest-stackwalker_arm_unittest.Po \
+	src/processor/$(DEPDIR)/stackwalker_e2k.Po \
 	src/processor/$(DEPDIR)/stackwalker_mips.Po \
 	src/processor/$(DEPDIR)/stackwalker_mips64_unittest-stackwalker_mips64_unittest.Po \
 	src/processor/$(DEPDIR)/stackwalker_mips_unittest-stackwalker_mips_unittest.Po \
@@ -2631,6 +2641,8 @@ CLEANFILES = $(am__append_12)
 @DISABLE_PROCESSOR_FALSE@	src/processor/stackwalker_sparc.h \
 @DISABLE_PROCESSOR_FALSE@	src/processor/stackwalker_x86.cc \
 @DISABLE_PROCESSOR_FALSE@	src/processor/stackwalker_x86.h \
+@DISABLE_PROCESSOR_FALSE@	src/processor/stackwalker_e2k.cc \
+@DISABLE_PROCESSOR_FALSE@	src/processor/stackwalker_e2k.h \
 @DISABLE_PROCESSOR_FALSE@	src/processor/static_address_map-inl.h \
 @DISABLE_PROCESSOR_FALSE@	src/processor/static_address_map.h \
 @DISABLE_PROCESSOR_FALSE@	src/processor/static_contained_range_map-inl.h \
@@ -3098,6 +3110,7 @@ TESTS = $(check_PROGRAMS) $(check_SCRIPTS)
 @DISABLE_PROCESSOR_FALSE@	src/processor/stackwalker_ppc64.o \
 @DISABLE_PROCESSOR_FALSE@	src/processor/stackwalker_sparc.o \
 @DISABLE_PROCESSOR_FALSE@	src/processor/stackwalker_x86.o \
+@DISABLE_PROCESSOR_FALSE@	src/processor/stackwalker_e2k.o \
 @DISABLE_PROCESSOR_FALSE@	src/processor/symbolic_constants_win.o \
 @DISABLE_PROCESSOR_FALSE@	src/processor/tokenize.o \
 @DISABLE_PROCESSOR_FALSE@	src/third_party/libdisasm/libdisasm.a \
@@ -3179,6 +3192,7 @@ TESTS = $(check_PROGRAMS) $(check_SCRIPTS)
 @DISABLE_PROCESSOR_FALSE@	src/processor/stackwalker_ppc64.o \
 @DISABLE_PROCESSOR_FALSE@	src/processor/stackwalker_sparc.o \
 @DISABLE_PROCESSOR_FALSE@	src/processor/stackwalker_x86.o \
+@DISABLE_PROCESSOR_FALSE@	src/processor/stackwalker_e2k.o \
 @DISABLE_PROCESSOR_FALSE@	src/processor/tokenize.o \
 @DISABLE_PROCESSOR_FALSE@	$(TEST_LIBS) \
 @DISABLE_PROCESSOR_FALSE@	$(PTHREAD_CFLAGS) $(PTHREAD_LIBS)
@@ -3220,6 +3234,7 @@ TESTS = $(check_PROGRAMS) $(check_SCRIPTS)
 @DISABLE_PROCESSOR_FALSE@	src/processor/stackwalker_ppc64.o \
 @DISABLE_PROCESSOR_FALSE@	src/processor/stackwalker_sparc.o \
 @DISABLE_PROCESSOR_FALSE@	src/processor/stackwalker_x86.o \
+@DISABLE_PROCESSOR_FALSE@	src/processor/stackwalker_e2k.o \
 @DISABLE_PROCESSOR_FALSE@	src/processor/symbolic_constants_win.o \
 @DISABLE_PROCESSOR_FALSE@	src/processor/tokenize.o \
 @DISABLE_PROCESSOR_FALSE@	src/third_party/libdisasm/libdisasm.a \
@@ -3383,6 +3398,7 @@ TESTS = $(check_PROGRAMS) $(check_SCRIPTS)
 @DISABLE_PROCESSOR_FALSE@	src/processor/stackwalker_ppc64.o \
 @DISABLE_PROCESSOR_FALSE@	src/processor/stackwalker_sparc.o \
 @DISABLE_PROCESSOR_FALSE@	src/processor/stackwalker_x86.o \
+@DISABLE_PROCESSOR_FALSE@	src/processor/stackwalker_e2k.o \
 @DISABLE_PROCESSOR_FALSE@	src/processor/tokenize.o \
 @DISABLE_PROCESSOR_FALSE@	$(PTHREAD_CFLAGS) $(PTHREAD_LIBS)
 
@@ -3571,6 +3587,7 @@ TESTS = $(check_PROGRAMS) $(check_SCRIPTS)
 @DISABLE_PROCESSOR_FALSE@	src/processor/stackwalker_ppc64.o \
 @DISABLE_PROCESSOR_FALSE@	src/processor/stackwalker_sparc.o \
 @DISABLE_PROCESSOR_FALSE@	src/processor/stackwalker_x86.o \
+@DISABLE_PROCESSOR_FALSE@	src/processor/stackwalker_e2k.o \
 @DISABLE_PROCESSOR_FALSE@	src/processor/tokenize.o \
 @DISABLE_PROCESSOR_FALSE@	src/third_party/libdisasm/libdisasm.a
 
@@ -3611,6 +3628,7 @@ TESTS = $(check_PROGRAMS) $(check_SCRIPTS)
 @DISABLE_PROCESSOR_FALSE@	src/processor/stackwalker_ppc64.o \
 @DISABLE_PROCESSOR_FALSE@	src/processor/stackwalker_sparc.o \
 @DISABLE_PROCESSOR_FALSE@	src/processor/stackwalker_x86.o \
+@DISABLE_PROCESSOR_FALSE@	src/processor/stackwalker_e2k.o \
 @DISABLE_PROCESSOR_FALSE@	src/processor/symbolic_constants_win.o \
 @DISABLE_PROCESSOR_FALSE@	src/processor/tokenize.o \
 @DISABLE_PROCESSOR_FALSE@	src/third_party/libdisasm/libdisasm.a
@@ -4300,6 +4318,9 @@ src/processor/stackwalker_sparc.$(OBJEXT):  \
 	src/processor/$(am__dirstamp) \
 	src/processor/$(DEPDIR)/$(am__dirstamp)
 src/processor/stackwalker_x86.$(OBJEXT):  \
+	src/processor/$(am__dirstamp) \
+	src/processor/$(DEPDIR)/$(am__dirstamp)
+src/processor/stackwalker_e2k.$(OBJEXT):  \
 	src/processor/$(am__dirstamp) \
 	src/processor/$(DEPDIR)/$(am__dirstamp)
 src/processor/symbolic_constants_win.$(OBJEXT):  \
@@ -5570,6 +5591,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/processor/$(DEPDIR)/stackwalker_arm64.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/processor/$(DEPDIR)/stackwalker_arm64_unittest-stackwalker_arm64_unittest.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/processor/$(DEPDIR)/stackwalker_arm_unittest-stackwalker_arm_unittest.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@src/processor/$(DEPDIR)/stackwalker_e2k.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/processor/$(DEPDIR)/stackwalker_mips.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/processor/$(DEPDIR)/stackwalker_mips64_unittest-stackwalker_mips64_unittest.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/processor/$(DEPDIR)/stackwalker_mips_unittest-stackwalker_mips_unittest.Po@am__quote@ # am--include-marker
@@ -9640,6 +9662,7 @@ distclean: distclean-am
 	-rm -f src/processor/$(DEPDIR)/stackwalker_arm64.Po
 	-rm -f src/processor/$(DEPDIR)/stackwalker_arm64_unittest-stackwalker_arm64_unittest.Po
 	-rm -f src/processor/$(DEPDIR)/stackwalker_arm_unittest-stackwalker_arm_unittest.Po
+	-rm -f src/processor/$(DEPDIR)/stackwalker_e2k.Po
 	-rm -f src/processor/$(DEPDIR)/stackwalker_mips.Po
 	-rm -f src/processor/$(DEPDIR)/stackwalker_mips64_unittest-stackwalker_mips64_unittest.Po
 	-rm -f src/processor/$(DEPDIR)/stackwalker_mips_unittest-stackwalker_mips_unittest.Po
@@ -9983,6 +10006,7 @@ maintainer-clean: maintainer-clean-am
 	-rm -f src/processor/$(DEPDIR)/stackwalker_arm64.Po
 	-rm -f src/processor/$(DEPDIR)/stackwalker_arm64_unittest-stackwalker_arm64_unittest.Po
 	-rm -f src/processor/$(DEPDIR)/stackwalker_arm_unittest-stackwalker_arm_unittest.Po
+	-rm -f src/processor/$(DEPDIR)/stackwalker_e2k.Po
 	-rm -f src/processor/$(DEPDIR)/stackwalker_mips.Po
 	-rm -f src/processor/$(DEPDIR)/stackwalker_mips64_unittest-stackwalker_mips64_unittest.Po
 	-rm -f src/processor/$(DEPDIR)/stackwalker_mips_unittest-stackwalker_mips_unittest.Po

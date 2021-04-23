@@ -1,4 +1,4 @@
-// Copyright (c) 2014, Google Inc.
+// Copyright (c) 2013 Google Inc.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -27,42 +27,42 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef CLIENT_LINUX_DUMP_WRITER_COMMON_UCONTEXT_READER_H
-#define CLIENT_LINUX_DUMP_WRITER_COMMON_UCONTEXT_READER_H
+// stackwalker_e2k.h: E2K-specific stackwalker.
+//
+// Author: Svyatoslav Stupak
 
-#include <sys/ucontext.h>
-#include <sys/user.h>
+#ifndef PROCESSOR_STACKWALKER_E2K_H__
+#define PROCESSOR_STACKWALKER_E2K_H__
 
-#include "client/linux/dump_writer_common/raw_context_cpu.h"
-#include "client/linux/minidump_writer/minidump_writer.h"
-#include "common/memory_allocator.h"
+#include "google_breakpad/common/breakpad_types.h"
 #include "google_breakpad/common/minidump_format.h"
+#include "google_breakpad/processor/stackwalker.h"
+#include "google_breakpad/processor/stack_frame_cpu.h"
+#include "processor/cfi_frame_info.h"
 
 namespace google_breakpad {
 
-// Wraps platform-dependent implementations of accessors to ucontext_t structs.
-struct UContextReader {
-  static uintptr_t GetStackPointer(const ucontext_t* uc);
+class CodeModules;
 
-  static uintptr_t GetInstructionPointer(const ucontext_t* uc);
-
-  // Juggle a arch-specific ucontext_t into a minidump format
-  //   out: the minidump structure
-  //   info: the collection of register structures.
-#if defined(__i386__) || defined(__x86_64)
-  static void FillCPUContext(RawContextCPU* out, const ucontext_t* uc,
-                             const fpstate_t* fp);
-#elif defined(__aarch64__)
-  static void FillCPUContext(RawContextCPU* out, const ucontext_t* uc,
-                             const struct fpsimd_context* fpregs);
-#elif defined(__e2k__)
-  static void FillCPUContext(RawContextCPU *out, const ucontext_t* uc,
-                             const struct user_regs_struct* regs);
-#else
-  static void FillCPUContext(RawContextCPU* out, const ucontext_t* uc);
-#endif
+class StackwalkerE2K : public Stackwalker {
+ public:
+  StackwalkerE2K(const SystemInfo* system_info,
+                 const MDRawContextE2K* context,
+                 MemoryRegion* memory,
+                 MemoryRegion* chain_stack,
+                 MemoryRegion* procedure_stack,
+                 const CodeModules* modules,
+                 StackFrameSymbolizer* frame_symbolizer); 
+ private:
+  virtual StackFrame* GetContextFrame();
+  virtual StackFrame* GetCallerFrame(const CallStack* stack,
+                                     bool stack_scan_allowed);
+  StackFrameE2K* GetCallerByStacks(const vector<StackFrame*>& frames);
+  const MDRawContextE2K* context_;
+  const MemoryRegion* chain_stack_;
+  const MemoryRegion* procedure_stack_;
 };
 
-}  // namespace google_breakpad
+} // namespace google_breakpad
 
-#endif  // CLIENT_LINUX_DUMP_WRITER_COMMON_UCONTEXT_READER_H
+#endif  // PROCESSOR_STACKWALKER_E2K_H
