@@ -70,7 +70,7 @@ StackFrame* StackwalkerE2K::GetContextFrame() {
   StackFrameE2K* frame = new StackFrameE2K();
   frame->context = *context_;
   frame->context_validity = StackFrameE2K::CONTEXT_VALID_ALL;
-  frame->trust = StackFrame::FRAME_TRUST_CONTEXT;
+  frame->trust = StackFrame::FRAME_TRUST_CF;
   frame->instruction = frame->context.cr0_hi & 0xfffffffffff8; // [VA_MSB:0] 8-aligned
   frame->pcs = frame->context.pcs - 0x20; // skip first frame(failed), its already in cr-s.
   frame->sp = frame->context.usd_lo & 0xffffffffffff; // [rwap base [47: 0]

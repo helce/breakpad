@@ -266,7 +266,7 @@ uintptr_t UContextReader::GetStackPointer(const ucontext_t* uc) {
 
 /* It's not stack pointer, just stack base to copy mapping. */
 uintptr_t UContextReader::GetInstructionPointer(const ucontext_t* uc) {
-  return uc->uc_mcontext.cr0_hi;
+  return uc->uc_mcontext.cr0_hi & 0xfffffffffff8; // [VA_MSB:0] 8-aligned
 }
 
 void UContextReader::FillCPUContext(RawContextCPU* out, const ucontext_t* uc,
