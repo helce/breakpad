@@ -581,7 +581,7 @@ typedef union {
     uint32_t elf_hwcaps;    /* linux specific, 0 otherwise */
   } arm_cpu_info;
   struct {
-    char vendor_id[64];
+    uint32_t vendor_id[3];
     uint32_t iset_id;       /* /proc/cpuinfo "cpu family" */
     uint32_t model_id;      /* /proc/cpuinfo "model" IDR.mdl 8bit */
     uint32_t revision_id;   /* /proc/cpuinfo "revision" */

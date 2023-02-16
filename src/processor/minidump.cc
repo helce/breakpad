@@ -3684,7 +3684,8 @@ const string* MinidumpSystemInfo::GetCPUVendor() {
   // CPU vendor information can only be determined from x86 minidumps.
   if (!cpu_vendor_ &&
       (system_info_.processor_architecture == MD_CPU_ARCHITECTURE_X86 ||
-       system_info_.processor_architecture == MD_CPU_ARCHITECTURE_X86_WIN64)) {
+       system_info_.processor_architecture == MD_CPU_ARCHITECTURE_X86_WIN64 ||
+       system_info_.processor_architecture == MD_CPU_ARCHITECTURE_E2K)) {
     char cpu_vendor_string[13];
     snprintf(cpu_vendor_string, sizeof(cpu_vendor_string),
              "%c%c%c%c%c%c%c%c%c%c%c%c",

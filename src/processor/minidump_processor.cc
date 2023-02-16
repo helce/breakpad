@@ -624,7 +624,12 @@ bool MinidumpProcessor::GetCPUInfo(Minidump* dump, SystemInfo* info) {
 
     case MD_CPU_ARCHITECTURE_E2K: {
       info->cpu = "e2k";
-      info->cpu_info.append(raw_system_info->cpu.e2k_cpu_info.vendor_id);
+      const string* cpu_vendor = system_info->GetCPUVendor();
+      if (cpu_vendor) {
+        info->cpu_info = *cpu_vendor;
+	info->cpu_info.append(" ");
+      }
+
       char e2k_info[24];
       snprintf(e2k_info, sizeof(e2k_info), " v%u model %u, revision %u",
                raw_system_info->cpu.e2k_cpu_info.iset_id,
