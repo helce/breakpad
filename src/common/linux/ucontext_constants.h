@@ -146,6 +146,8 @@
 #endif
 #define FPREGS_OFFSET_MXCSR  24
 
+#elif defined (__e2k__)
+// We are just saving additional registers in existing context
 #else
 #error "This header has not been ported for your CPU"
 #endif

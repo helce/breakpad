@@ -191,6 +191,10 @@ if !HAVE_GETCONTEXT
 src_client_linux_libbreakpad_client_a_SOURCES += \
 	src/common/linux/breakpad_getcontext.S
 endif
+if E2K_HOST
+src_client_linux_libbreakpad_client_a_SOURCES += \
+	src/common/linux/breakpad_getcontext.S
+endif
 endif LINUX_HOST
 
 if !DISABLE_PROCESSOR
@@ -511,6 +515,10 @@ src_client_linux_linux_client_unittest_shlib_SOURCES = \
 	src/processor/pathname_stripper.cc \
 	src/processor/proc_maps_linux.cc
 if !HAVE_GETCONTEXT
+src_client_linux_linux_client_unittest_shlib_SOURCES += \
+	src/common/linux/breakpad_getcontext.S
+endif
+if E2K_HOST
 src_client_linux_linux_client_unittest_shlib_SOURCES += \
 	src/common/linux/breakpad_getcontext.S
 endif

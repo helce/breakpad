@@ -481,6 +481,77 @@ breakpad_getcontext:
   .cfi_endproc
   .size breakpad_getcontext, . - breakpad_getcontext
 
+#elif defined(__e2k__)
+
+  .ignore ld_st_style
+  .ignore strict_delay
+  .text
+  .global breakpad_getcontext
+  .type breakpad_getcontext, @function
+  .align 8
+breakpad_getcontext:
+{
+  setwd wsz = 0x9, nfx = 0x1
+  setbn rsz = 0x4, rbs = 0x4, rcur = 0x1
+  getsp,0       _f32s,_lts1 0xffffffc0, %r2
+  addd,3,sm 0x0, %r0, %r3
+}
+{
+  rrd,0 %psp.hi, %r5
+  addd,1 %r2, _f64,_lts0 0x40, %r1
+}
+{
+  rrd,0 %psp.lo, %r4
+  std,2,sm      %r1, _f16s,_lts0lo 0xfff8, %r3
+}
+{
+  rrd,0 %usd.hi, %r3
+}
+{
+  rrd,0 %usd.lo, %r2
+  std,2,sm      %r1, _f16s,_lts0lo 0xffd8, %r5
+  std,5,sm      %r1, _f16s,_lts0hi 0xffe0, %r4
+}
+{
+  disp  %ctpr1, getcontext; ipd 2
+  std,2,sm      %r1, _f16s,_lts0lo 0xffe8, %r3
+  std,5,sm      %r1, _f16s,_lts0hi 0xfff0, %r2
+}
+{
+  nop 3
+  addd,0,sm     0x0, %r0, %b[0]
+}
+{
+  call  %ctpr1, wbs = 0x5
+}
+{
+  nop 3
+  adds,3        0x0, %b[0], %r0
+  return        %ctpr3; ipd 2
+}
+{
+  ldd,0 %r1, _f16s,_lts0lo 0xfff0, %r2, mas=0x4
+  ldd,2 %r1, _f16s,_lts0hi 0xffe8, %r3, mas=0x4
+  ldd,3 %r1, _f16s,_lts1lo 0xffe0, %r4, mas=0x4
+  ldd,5 %r1, _f16s,_lts1hi 0xffd8, %r5, mas=0x4
+}
+{
+  nop 2
+  ldd,0 %r1, _f16s,_lts0lo 0xfff8, %r6, mas=0x4
+}
+{
+  std,2,sm      %r6, _f16s,_lts0lo 0x50, %r2
+  std,5,sm      %r6, _f16s,_lts0hi 0x58, %r3
+}
+{
+  std,2,sm      %r6, _f16s,_lts0lo 0x60, %r4
+  std,5,sm      %r6, _f16s,_lts0hi 0x68, %r5
+}
+{
+  ct    %ctpr3
+}
+.size breakpad_getcontext, . - breakpad_getcontext
+
 #else
 #error "This file has not been ported for your CPU!"
 #endif
