@@ -307,7 +307,11 @@ TEST(ExceptionHandlerTest, ParallelChildCrashesDontHang) {
   }
 
   // Wait a while until the child should have crashed.
+#ifdef __e2k__
+  usleep(10000000);
+#else
   usleep(1000000);
+#endif
   // Kill the child if it is still running.
   kill(child, SIGKILL);
 
@@ -745,6 +749,8 @@ TEST(ExceptionHandlerTest, InstructionPointerMemoryMinBound) {
   unlink(minidump_path.c_str());
 }
 
+// This test does not emmit SIGILL in e2k
+#ifndef __e2k__
 // Test that the memory region around the instruction pointer is
 // bounded correctly on the high end.
 TEST(ExceptionHandlerTest, InstructionPointerMemoryMaxBound) {
@@ -835,6 +841,7 @@ TEST(ExceptionHandlerTest, InstructionPointerMemoryMaxBound) {
 
   unlink(minidump_path.c_str());
 }
+#endif
 
 #ifndef ADDRESS_SANITIZER
 
