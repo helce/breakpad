@@ -281,6 +281,7 @@ class MinidumpThread : public MinidumpObject {
   virtual ~MinidumpThread();
 
   const MDRawThread* thread() const { return valid_ ? &thread_ : NULL; }
+  const MDRawE2kThreadExtend* e2k_thread() const { return valid_? &e2k_thread_ : NULL; }
   // GetMemory may return NULL even if the MinidumpThread is valid,
   // if the thread memory cannot be read.
   virtual MinidumpMemoryRegion* GetMemory();
@@ -318,6 +319,7 @@ class MinidumpThread : public MinidumpObject {
   bool Read();
 
   MDRawThread           thread_;
+  MDRawE2kThreadExtend  e2k_thread_;
   MinidumpMemoryRegion* memory_;
   MinidumpMemoryRegion* chain_stack_;
   MinidumpMemoryRegion* procedure_stack_;

@@ -371,11 +371,14 @@ typedef struct {
   uint32_t             priority;
   uint64_t             teb;             /* Thread environment block */
   MDMemoryDescriptor   stack;
-  MDMemoryDescriptor   proc_stack;
-  MDMemoryDescriptor   chain_stack;
   MDLocationDescriptor thread_context;  /* MDRawContext[CPU] */
 } MDRawThread;  /* MINIDUMP_THREAD */
 
+typedef struct {
+  uint32_t             thread_id;
+  MDMemoryDescriptor   proc_stack;
+  MDMemoryDescriptor   chain_stack;
+} MDRawE2kThreadExtend; /* MINIDUMP_THREAD_E2K */
 
 typedef struct {
   uint32_t    number_of_threads;

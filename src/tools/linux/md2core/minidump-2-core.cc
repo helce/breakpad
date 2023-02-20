@@ -599,16 +599,18 @@ ParseThreadList(const Options& options, CrashedProcess* crashinfo,
     thread.stack = stack_range.data();
     thread.stack_length = rawthread->stack.memory.data_size;
     #if defined(__e2k__)
-    thread.proc_stack_addr = rawthread->proc_stack.start_of_memory_range;
+    const MDRawE2kThreadExtend *e2krawthread =
+        range.GetArrayElement<MDRawE2kThreadExtend>(sizeof(uint32_t), num_threads + i);
+    thread.proc_stack_addr = e2krawthread->proc_stack.start_of_memory_range;
     MinidumpMemoryRange proc_stack_range =
-        full_file.Subrange(rawthread->proc_stack.memory);
+        full_file.Subrange(e2krawthread->proc_stack.memory);
     thread.proc_stack = proc_stack_range.data();
-    thread.proc_stack_length = rawthread->proc_stack.memory.data_size;
-    thread.chain_stack_addr = rawthread->chain_stack.start_of_memory_range;
+    thread.proc_stack_length = e2krawthread->proc_stack.memory.data_size;
+    thread.chain_stack_addr = e2krawthread->chain_stack.start_of_memory_range;
     MinidumpMemoryRange chain_stack_range =
-        full_file.Subrange(rawthread->chain_stack.memory);
+        full_file.Subrange(e2krawthread->chain_stack.memory);
     thread.chain_stack = chain_stack_range.data();
-    thread.chain_stack_length = rawthread->chain_stack.memory.data_size;
+    thread.chain_stack_length = e2krawthread->chain_stack.memory.data_size;
     #endif
 
     ParseThreadRegisters(&thread,

@@ -375,7 +375,7 @@ class MinidumpWriter {
   }
 
 #if defined(__e2k__)
-  bool FillThreadHWStack(MDRawThread* thread, uintptr_t stack_base,
+  bool FillThreadHWStack(MDRawE2kThreadExtend* thread, uintptr_t stack_base,
                          uintptr_t stack_pointer, bool is_procedure) {
   uint8_t *stack_copy = NULL;
   size_t stack_len = stack_pointer - stack_base;
@@ -404,8 +404,13 @@ class MinidumpWriter {
     const unsigned num_threads = dumper_->threads().size();
 
     TypedMDRVA<uint32_t> list(&minidump_writer_);
+#if defined(__e2k__)
+    if (!list.AllocateObjectAndArray(num_threads, sizeof(MDRawThread) + sizeof(MDRawE2kThreadExtend)))
+      return false;
+#else
     if (!list.AllocateObjectAndArray(num_threads, sizeof(MDRawThread)))
       return false;
+#endif
 
     dirent->stream_type = MD_THREAD_LIST_STREAM;
     dirent->location = list.location();
@@ -431,6 +436,11 @@ class MinidumpWriter {
       MDRawThread thread;
       my_memset(&thread, 0, sizeof(thread));
       thread.thread_id = dumper_->threads()[i];
+#if defined(__e2k__)
+      MDRawE2kThreadExtend e2k_thread;
+      my_memset(&e2k_thread, 0, sizeof(e2k_thread));
+      e2k_thread.thread_id = dumper_->threads()[i];
+#endif
 
       // We have a different source of information for the crashing thread. If
       // we used the actual state of the thread we would find it running in the
@@ -503,9 +513,9 @@ class MinidumpWriter {
         }
         UContextReader::FillCPUContext(cpu.get(), ucontext_, &e2k_regs);
         // Copy procedure and chain stacks
-        if (!FillThreadHWStack(&thread, e2k_regs.proc_stack_base, cpu.get()->ps, true))
+        if (!FillThreadHWStack(&e2k_thread, e2k_regs.proc_stack_base, cpu.get()->ps, true))
           return false;
-        if (!FillThreadHWStack(&thread, e2k_regs.chain_stack_base, cpu.get()->pcs, false))
+        if (!FillThreadHWStack(&e2k_thread, e2k_regs.chain_stack_base, cpu.get()->pcs, false))
           return false;
 #else
         UContextReader::FillCPUContext(cpu.get(), ucontext_);
@@ -531,13 +541,13 @@ class MinidumpWriter {
           return false;
         my_memset(cpu.get(), 0, sizeof(RawContextCPU));
         info.FillCPUContext(cpu.get());
-        #if defined(__e2k__)
+#if defined(__e2k__)
         // Copy procedure and chain stacks
-        if (!FillThreadHWStack(&thread, info.proc_stack_base, cpu.get()->ps, true))
+        if (!FillThreadHWStack(&e2k_thread, info.proc_stack_base, cpu.get()->ps, true))
           return false;
-        if (!FillThreadHWStack(&thread, info.chain_stack_base, cpu.get()->pcs, false))
+        if (!FillThreadHWStack(&e2k_thread, info.chain_stack_base, cpu.get()->pcs, false))
           return false;
-        #endif
+#endif
         thread.thread_context = cpu.location();
         if (dumper_->threads()[i] == GetCrashThread()) {
           crashing_thread_context_ = cpu.location();
@@ -551,6 +561,9 @@ class MinidumpWriter {
       }
 
       list.CopyIndexAfterObject(i, &thread, sizeof(thread));
+#if defined(__e2k__)
+      list.CopyIndexAfterObject(num_threads + i, &e2k_thread, sizeof(e2k_thread));
+#endif
     }
 
     return true;

@@ -1653,7 +1653,7 @@ uint64_t MinidumpThread::GetStartOfChainStackRange() const {
     return 0;
   }
 
-  return thread_.chain_stack.start_of_memory_range;
+  return e2k_thread_.chain_stack.start_of_memory_range;
 }
 
 uint64_t MinidumpThread::GetStartOfProcedureStackRange() const {
@@ -1662,7 +1662,7 @@ uint64_t MinidumpThread::GetStartOfProcedureStackRange() const {
     return 0;
   }
 
-  return thread_.proc_stack.start_of_memory_range;
+  return e2k_thread_.proc_stack.start_of_memory_range;
 }
 
 MinidumpMemoryRegion* MinidumpThread::GetMemory() {
