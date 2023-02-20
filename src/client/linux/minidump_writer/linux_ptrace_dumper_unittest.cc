@@ -330,7 +330,7 @@ TEST_F(LinuxPtraceDumperChildTest, BuildProcPath) {
   EXPECT_FALSE(dumper.BuildProcPath(maps_path, 123, long_node));
 }
 
-#if !defined(__ARM_EABI__) && !defined(__mips__)
+#if !defined(__ARM_EABI__) && !defined(__mips__) && !defined(__e2k__)
 // Ensure that the linux-gate VDSO is included in the mapping list.
 TEST_F(LinuxPtraceDumperChildTest, MappingsIncludeLinuxGate) {
   LinuxPtraceDumper dumper(getppid());
@@ -462,6 +462,9 @@ TEST(LinuxPtraceDumperTest, VerifyStackReadWithMultipleThreads) {
 #elif defined(__mips__)
     pid_t* process_tid_location =
         reinterpret_cast<pid_t*>(one_thread.mcontext.gregs[1]);
+#elif defined(__e2k__)
+    pid_t* process_tid_location =
+        reinterpret_cast<pid_t*>(one_thread.regs.g[16]);
 #else
 #error This test has not been ported to this platform.
 #endif
@@ -559,6 +562,8 @@ TEST_F(LinuxPtraceDumperTest, SanitizeStackCopy) {
   uintptr_t heap_addr = thread_info.regs.rcx;
 #elif defined(__mips__)
   uintptr_t heap_addr = thread_info.mcontext.gregs[1];
+#elif defined(__e2k__)
+  uintptr_t heap_addr = thread_info.regs.g[16];
 #else
 #error This test has not been ported to this platform.
 #endif
