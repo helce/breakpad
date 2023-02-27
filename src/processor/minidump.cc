@@ -1580,6 +1580,7 @@ void MinidumpMemoryRegion::SetPrintMode(bool hexdump,
 MinidumpThread::MinidumpThread(Minidump* minidump)
     : MinidumpObject(minidump),
       thread_(),
+      e2k_thread_(),
       memory_(NULL),
       chain_stack_(NULL),
       procedure_stack_(NULL),
@@ -1632,6 +1633,60 @@ bool MinidumpThread::Read() {
   } else {
     memory_ = new MinidumpMemoryRegion(minidump_);
     memory_->SetDescriptor(&thread_.stack);
+  }
+
+  valid_ = true;
+  return true;
+}
+
+bool MinidumpThread::ReadExtend() {
+  // Invalidate cached data.
+  delete chain_stack_;
+  chain_stack_ = NULL;
+  delete procedure_stack_;
+  procedure_stack_ = NULL;
+
+  valid_ = false;
+
+  if (!minidump_->ReadBytes(&e2k_thread_, sizeof(e2k_thread_))) {
+    BPLOG(ERROR) << "MinidumpThread cannot read e2k extended thread";
+    return false;
+  }
+
+  if (minidump_->swap()) {
+    Swap(&e2k_thread_.thread_id);
+    Swap(&e2k_thread_.proc_stack);
+    Swap(&e2k_thread_.chain_stack);
+  }
+
+  // Check for base + size overflow or undersize.
+  if (e2k_thread_.proc_stack.memory.rva == 0 ||
+      e2k_thread_.proc_stack.memory.data_size == 0 ||
+      e2k_thread_.proc_stack.memory.data_size > numeric_limits<uint64_t>::max() -
+                                       e2k_thread_.proc_stack.start_of_memory_range) {
+    // This is ok, but log an error anyway.
+    BPLOG(ERROR) << "MinidumpThread has a procedure stack region problem, " <<
+                    HexString(e2k_thread_.proc_stack.start_of_memory_range) << "+" <<
+                    HexString(e2k_thread_.proc_stack.memory.data_size) <<
+                    ", RVA 0x" << HexString(e2k_thread_.proc_stack.memory.rva);
+  } else {
+    procedure_stack_ = new MinidumpMemoryRegion(minidump_);
+    procedure_stack_->SetDescriptor(&e2k_thread_.proc_stack);
+  }
+
+  // Check for base + size overflow or undersize.
+  if (e2k_thread_.chain_stack.memory.rva == 0 ||
+      e2k_thread_.chain_stack.memory.data_size == 0 ||
+      e2k_thread_.chain_stack.memory.data_size > numeric_limits<uint64_t>::max() -
+                                       e2k_thread_.chain_stack.start_of_memory_range) {
+    // This is ok, but log an error anyway.
+    BPLOG(ERROR) << "MinidumpThread has a chain stack region problem, " <<
+                    HexString(e2k_thread_.chain_stack.start_of_memory_range) << "+" <<
+                    HexString(e2k_thread_.chain_stack.memory.data_size) <<
+                    ", RVA 0x" << HexString(e2k_thread_.chain_stack.memory.rva);
+  } else {
+    chain_stack_ = new MinidumpMemoryRegion(minidump_);
+    chain_stack_->SetDescriptor(&e2k_thread_.chain_stack);
   }
 
   valid_ = true;
@@ -1798,6 +1853,7 @@ MinidumpThreadList::~MinidumpThreadList() {
 
 
 bool MinidumpThreadList::Read(uint32_t expected_size) {
+  bool is_e2k_thread = false;
   // Invalidate cached data.
   id_to_thread_map_.clear();
   delete threads_;
@@ -1837,6 +1893,11 @@ bool MinidumpThreadList::Read(uint32_t expected_size) {
                         "bytes";
         return false;
       }
+    // may be e2k extended thread
+    } else if (expected_size == sizeof(thread_count) + thread_count *
+                                (sizeof(MDRawThread) + sizeof(MDRawE2kThreadExtend))) {
+      BPLOG(INFO) << "MinidumpThreadList with e2k extended threads.";
+      is_e2k_thread = true;
     } else {
       BPLOG(ERROR) << "MinidumpThreadList size mismatch, " << expected_size <<
                     " != " << sizeof(thread_count) +
@@ -1883,6 +1944,19 @@ bool MinidumpThreadList::Read(uint32_t expected_size) {
         return false;
       }
       id_to_thread_map_[thread_id] = thread;
+    }
+
+    if (is_e2k_thread) {
+      for (unsigned int thread_index = 0;
+           thread_index < thread_count;
+           ++thread_index) {
+        MinidumpThread* thread = &(*threads)[thread_index];
+
+        if (!thread->ReadExtend()) {
+          BPLOG(ERROR) << "MinidumpThreadList cannot read e2k thread extend" <<
+                          thread_index << "/" << thread_count;
+        }
+      }
     }
 
     threads_ = threads.release();

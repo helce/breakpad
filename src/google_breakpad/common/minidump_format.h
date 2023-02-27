@@ -378,6 +378,7 @@ typedef struct {
   uint32_t             thread_id;
   MDMemoryDescriptor   proc_stack;
   MDMemoryDescriptor   chain_stack;
+  uint64_t             unused;
 } MDRawE2kThreadExtend; /* MINIDUMP_THREAD_E2K */
 
 typedef struct {

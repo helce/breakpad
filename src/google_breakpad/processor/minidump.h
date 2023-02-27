@@ -317,6 +317,7 @@ class MinidumpThread : public MinidumpObject {
   // MinidumpThreadList.  No size checking is done, because
   // MinidumpThreadList handles that directly.
   bool Read();
+  bool ReadExtend();
 
   MDRawThread           thread_;
   MDRawE2kThreadExtend  e2k_thread_;
