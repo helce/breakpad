@@ -77,6 +77,10 @@ TEST(MinidumpWriterTest, SetupWithPath) {
 
   ExceptionHandler::CrashContext context;
   memset(&context, 0, sizeof(context));
+#ifdef __e2k__
+  // Need some context or FillThreadHWStack will fail
+  ASSERT_EQ(0, getcontext(&context.context));
+#endif
 
   AutoTempDir temp_dir;
   string templ = temp_dir.path() + kMDWriterUnitTestFileName;
@@ -107,6 +111,10 @@ TEST(MinidumpWriterTest, SetupWithFD) {
 
   ExceptionHandler::CrashContext context;
   memset(&context, 0, sizeof(context));
+#ifdef __e2k__
+  // Need some context or FillThreadHWStack will fail
+  ASSERT_EQ(0, getcontext(&context.context));
+#endif
 
   AutoTempDir temp_dir;
   string templ = temp_dir.path() + kMDWriterUnitTestFileName;
@@ -563,6 +571,10 @@ TEST(MinidumpWriterTest, DeletedBinary) {
 
   ExceptionHandler::CrashContext context;
   memset(&context, 0, sizeof(context));
+#ifdef __e2k__
+  // Need some context or FillThreadHWStack will fail
+  ASSERT_EQ(0, getcontext(&context.context));
+#endif
 
   string templ = temp_dir.path() + kMDWriterUnitTestFileName;
   // Set a non-zero tid to avoid tripping asserts.
@@ -715,6 +727,8 @@ TEST(MinidumpWriterTest, InvalidStackPointer) {
 #elif defined(__mips__)
   context.context.uc_mcontext.gregs[MD_CONTEXT_MIPS_REG_SP] =
       invalid_stack_pointer;
+#elif defined(__e2k__)
+  context.context.uc_mcontext.usd_lo = invalid_stack_pointer;
 #else
 # error "This code has not been ported to your platform yet."
 #endif
