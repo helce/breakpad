@@ -211,10 +211,17 @@ TEST(FunctionNames, Mangled) {
   Module::Function *function = functions[0];
   // This is GCC-specific, but we shouldn't be seeing STABS data anywhere
   // but Linux.
+#ifdef __LCC__
+  EXPECT_STREQ("std::vector<unsigned long long, "
+               "std::allocator<unsigned long long>>::"
+               "push_back(const unsigned long long &)",
+               function->name.c_str());
+#else
   EXPECT_STREQ("std::vector<unsigned long long, "
                "std::allocator<unsigned long long> >::"
                "push_back(unsigned long long const&)",
                function->name.c_str());
+#endif
   EXPECT_EQ(0xf2cfda63cef7f46dLL, function->address);
   EXPECT_LT(0U, function->ranges[0].size); // should have used dummy size
   EXPECT_EQ(0U, function->parameter_size);
