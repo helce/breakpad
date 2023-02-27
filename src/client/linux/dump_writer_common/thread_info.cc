@@ -276,9 +276,8 @@ void ThreadInfo::FillCPUContext(RawContextCPU* out) const {
 #define E2K_PCSHTP_SIZE 11
 #define E2K_PSHTP_SIZE 12
 
-/* Regular instruction pointer */
 uintptr_t ThreadInfo::GetInstructionPointer() const {
-  return regs.ip;
+  return regs.cr0_hi & 0xfffffffffff8; // [VA_MSB:0] 8-aligned;
 }
 
 void ThreadInfo::FillCPUContext(RawContextCPU* out) const {
