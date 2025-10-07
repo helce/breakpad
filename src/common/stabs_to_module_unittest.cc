@@ -211,7 +211,7 @@ TEST(FunctionNames, Mangled) {
   Module::Function *function = functions[0];
   // This is GCC-specific, but we shouldn't be seeing STABS data anywhere
   // but Linux.
-#ifdef __LCC__
+#ifdef  __e2k__
   EXPECT_STREQ("std::vector<unsigned long long, "
                "std::allocator<unsigned long long>>::"
                "push_back(const unsigned long long &)",
