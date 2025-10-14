@@ -74,7 +74,7 @@ AC_SYS_LARGEFILE
 AX_PTHREAD
 AC_CHECK_HEADERS([a.out.h sys/mman.h sys/random.h])
 AC_CHECK_FUNCS([arc4random getcontext getrandom memfd_create])
-AM_CONDITIONAL([HAVE_GETCONTEXT], [test "x$ac_cv_func_getcontext" = xyes])
+AM_CONDITIONAL([HAVE_GETCONTEXT], [test "x$ac_cv_func_getcontext" = xyes -o test "x$host_cpu" != xe2k])
 AM_CONDITIONAL([HAVE_MEMFD_CREATE], [test "x$ac_cv_func_memfd_create" = xyes])
 
 AX_CXX_COMPILE_STDCXX(11, noext, mandatory)
@@ -127,12 +127,8 @@ case $host_cpu in
   i?86|x86_64)
     X86_HOST=true
     ;;
-  e2k)
-    E2K_HOST=true
-    ;;
 esac
 AM_CONDITIONAL(X86_HOST, test x$X86_HOST = xtrue)
-AM_CONDITIONAL(E2K_HOST, test x$E2K_HOST = xtrue)
 
 AC_ARG_ENABLE(processor,
               AS_HELP_STRING([--disable-processor],
