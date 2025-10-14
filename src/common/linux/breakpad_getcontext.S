@@ -482,6 +482,8 @@ breakpad_getcontext:
   .size breakpad_getcontext, . - breakpad_getcontext
 
 #elif defined(__e2k__)
+/* Simillar with libc,
+ * but with additional saves of usd_(lo,hi) and psp_(lo,hi) */
 
   .ignore ld_st_style
   .ignore strict_delay
@@ -491,64 +493,69 @@ breakpad_getcontext:
   .align 8
 breakpad_getcontext:
 {
-  setwd wsz = 0x9, nfx = 0x1
+  setwd wsz = 0x9, nfx = 0x1, dbl = 0x0
   setbn rsz = 0x4, rbs = 0x4, rcur = 0x1
-  getsp,0       _f32s 0xffffffc0, %r2
-  addd,3,sm 0x0, %r0, %r3
 }
 {
-  rrd,0 %psp.hi, %r5
-  addd,1 %r2, _f64 0x40, %r1
+  rrd,0 %psp.hi, %r2
+  addd,1 0x0, 0x4, %b[0]
+  addd,2 0x0, %r0, %b[1]
+  sdisp  %ctpr1, 6
+}
+{
+  rrd,0 %cr0.hi, %r3
+  addd,1 0x0, 0x8, %b[2]
+  std,2 %r0, _f16s 0x68, %r2
+}
+{
+  rrd,0 %cr1.lo, %r2
+  std,2 %r0, _f16s 0x30, %r3
+}
+{
+  rrd,0 %cr1.hi, %r3
+  addd,1,sm     0x0, %r0, %r2
+  std,2 %r0, _f16s 0x38, %r2
 }
 {
   rrd,0 %psp.lo, %r4
-  std,2,sm      %r1, _f16s 0xfff8, %r3
+  std,2 %r0, _f16s 0x40, %r3
 }
 {
   rrd,0 %usd.hi, %r3
+  std,2 %r0, _f16s 0x60, %r4
 }
 {
-  rrd,0 %usd.lo, %r2
-  std,2,sm      %r1, _f16s 0xffd8, %r5
-  std,5,sm      %r1, _f16s 0xffe0, %r4
+  rrd,0 %usd.lo, %r4
+  std,2 %r0, _f16s 0x58, %r3
 }
 {
-  disp  %ctpr1, getcontext; ipd 2
-  std,2,sm      %r1, _f16s 0xffe8, %r3
-  std,5,sm      %r1, _f16s 0xfff0, %r2
+  std,2 %r0, _f16s 0x50, %r4
+  call   %ctpr1, wbs = 0x5
 }
 {
-  nop 3
-  addd,0,sm     0x0, %r0, %b[0]
+  return        %ctpr3
+  addd,0        0x0, %db[0], %r3
+  cmpbedb,1     %db[0], _f16s 0xf000, %pred0
+  subd,2,sm     0x0, %db[0], %r4
 }
 {
-  call  %ctpr1, wbs = 0x5
+  disp  %ctpr1, __errno_location
 }
 {
-  nop 3
-  adds,3        0x0, %b[0], %r0
-  return        %ctpr3; ipd 2
+  sxt,3 0x2, %r3, %r0 ? %pred0
+  call  %ctpr1, wbs = 0x5 ? ~%pred0
 }
 {
-  ldd,0 %r1, _f16s 0xfff0, %r2, mas=0x4
-  ldd,2 %r1, _f16s 0xffe8, %r3, mas=0x4
-  ldd,3 %r1, _f16s 0xffe0, %r4, mas=0x4
-  ldd,5 %r1, _f16s 0xffd8, %r5, mas=0x4
+  ct    %ctpr3 ? %pred0
+  subd,3        0x0, 0x1, %r0 ? ~%pred0
+  stw,5 %b[0], 0x0, %r4 ? ~%pred0
 }
 {
-  nop 2
-  ldd,0 %r1, _f16s 0xfff8, %r6, mas=0x4
+  nop 1
+  return        %ctpr3
 }
 {
-  std,2,sm      %r6, _f16s 0x50, %r2
-  std,5,sm      %r6, _f16s 0x58, %r3
-}
-{
-  std,2,sm      %r6, _f16s 0x60, %r4
-  std,5,sm      %r6, _f16s 0x68, %r5
-}
-{
-  ct    %ctpr3
+  ct    %ctpr3 ? ~%pred0
 }
 .size breakpad_getcontext, . - breakpad_getcontext
 
