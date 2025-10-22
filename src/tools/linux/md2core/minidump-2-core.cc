@@ -567,9 +567,6 @@ ParseThreadRegisters(CrashedProcess::Thread* thread,
   thread->regs.pcsp_lo = rawregs->pcsp_lo;
   thread->regs.pcsp_hi = rawregs->pcsp_hi;
   thread->regs.pcshtp = rawregs->pcshtp;
-  thread->regs.ctpr1 = rawregs->ctpr1;
-  thread->regs.ctpr2 = rawregs->ctpr2;
-  thread->regs.ctpr3 = rawregs->ctpr3;
 }
 #else
 #error "This code has not been ported to your platform yet"

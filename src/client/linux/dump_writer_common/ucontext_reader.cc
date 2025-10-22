@@ -283,9 +283,6 @@ void UContextReader::FillCPUContext(RawContextCPU* out, const ucontext_t* uc,
   out->cr1_hi = uc->uc_mcontext.cr1_hi;
   out->pcsp_lo = uc->uc_mcontext.pcsp_lo;
   out->pcsp_hi = uc->uc_mcontext.pcsp_hi;
-  out->ctpr1 = uc->uc_extra.ctpr1;
-  out->ctpr2 = uc->uc_extra.ctpr2;
-  out->ctpr3 = uc->uc_extra.ctpr3;
 
   // Get from user_regs
   out->pshtp = regs->pshtp;

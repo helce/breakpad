@@ -85,9 +85,6 @@ typedef struct {
   uint64_t    pcsp_lo;
   uint64_t    pcsp_hi;
   uint64_t    pcshtp;
-  uint64_t    ctpr1;
-  uint64_t    ctpr2;
-  uint64_t    ctpr3;
   uint64_t    ps;
   uint64_t    pcs;
 } MDRawContextE2K; /* CONTEXT */

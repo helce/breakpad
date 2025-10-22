@@ -1209,9 +1209,6 @@ bool MinidumpContext::Read(uint32_t expected_size) {
           Swap(&context_e2k->pcsp_lo);
           Swap(&context_e2k->pcsp_hi);
           Swap(&context_e2k->pcshtp);
-          Swap(&context_e2k->ctpr1);
-          Swap(&context_e2k->ctpr2);
-          Swap(&context_e2k->ctpr3);
           Swap(&context_e2k->ps);
           Swap(&context_e2k->pcs);
         }

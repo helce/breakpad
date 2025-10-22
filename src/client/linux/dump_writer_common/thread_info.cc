@@ -297,9 +297,6 @@ void ThreadInfo::FillCPUContext(RawContextCPU* out) const {
   out->pcsp_lo = regs.pcsp_lo;
   out->pcsp_hi = regs.pcsp_hi;
   out->pcshtp = regs.pcshtp;
-  out->ctpr1 = regs.ctpr1;
-  out->ctpr2 = regs.ctpr2;
-  out->ctpr3 = regs.ctpr3;
 
   /* Get chain stack pointer pcsp_lo(base) + pcsp_hi(ind) + signed(pcshtp) */
   out->pcs = (regs.pcsp_lo & 0xffffffffffff) + (regs.pcsp_hi & 0xffffffff) +
