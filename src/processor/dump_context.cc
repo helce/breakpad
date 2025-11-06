@@ -693,14 +693,12 @@ void DumpContext::Print() {
       printf("  usd_hi              = 0x%" PRIx64 "\n", context_e2k->usd_hi);
       printf("  psp_lo              = 0x%" PRIx64 "\n", context_e2k->psp_lo);
       printf("  psp_hi              = 0x%" PRIx64 "\n", context_e2k->psp_hi);
-      printf("  pshtp               = 0x%" PRIx64 "\n", context_e2k->pshtp);
       printf("  cr0_lo              = 0x%" PRIx64 "\n", context_e2k->cr0_lo);
       printf("  cr0_hi              = 0x%" PRIx64 "\n", context_e2k->cr0_hi);
       printf("  cr1_lo              = 0x%" PRIx64 "\n", context_e2k->cr1_lo);
       printf("  cr1_hi              = 0x%" PRIx64 "\n", context_e2k->cr1_hi);
       printf("  pcsp_lo             = 0x%" PRIx64 "\n", context_e2k->pcsp_lo);
       printf("  pcsp_hi             = 0x%" PRIx64 "\n", context_e2k->pcsp_hi);
-      printf("  pcshtp              = 0x%" PRIx64 "\n", context_e2k->pcshtp);
       printf("  ps                  = 0x%" PRIx64 "\n", context_e2k->ps);
       printf("  pcs                 = 0x%" PRIx64 "\n", context_e2k->pcs);
       break;

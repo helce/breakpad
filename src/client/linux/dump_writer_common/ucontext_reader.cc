@@ -257,9 +257,6 @@ void UContextReader::FillCPUContext(RawContextCPU* out, const ucontext_t* uc) {
 
 #elif defined(__e2k__)
 
-#define E2K_PCSHTP_SIZE 11
-#define E2K_PSHTP_SIZE 12
-
 uintptr_t UContextReader::GetStackPointer(const ucontext_t* uc) {
   return uc->uc_mcontext.usd_lo & 0xffffffffffff; // [rwap base [47: 0]
 }
@@ -285,21 +282,15 @@ void UContextReader::FillCPUContext(RawContextCPU* out, const ucontext_t* uc,
   out->pcsp_hi = uc->uc_mcontext.pcsp_hi;
 
   // Get from user_regs
-  out->pshtp = regs->pshtp;
-  out->pcshtp = regs->pcshtp;
   for (int i = 0; i < MD_CONTEXT_E2K_GREGS_COUNT; ++i)
     out->g[i] = regs->g[i];
 
-  /* Get chain stack pointer pcsp_lo(base) + pcsp_hi(ind) + signed(pcshtp) */
+  /* Get chain stack pointer pcsp_lo(base) + pcsp_hi(ind) */
   out->pcs = (uc->uc_mcontext.pcsp_lo & 0xffffffffffff) +
-             (uc->uc_mcontext.pcsp_hi & 0xffffffff) +
-             ((uint64_t) (((int64_t) (regs->pcshtp) <<
-             (64 - E2K_PCSHTP_SIZE)) >> (64 - E2K_PCSHTP_SIZE)));
-  /* Get procedure stack pointer psp_lo(base) + psp_hi(ind) + 2 * signed(pshtp) */
+             (uc->uc_mcontext.pcsp_hi & 0xffffffff);
+  /* Get procedure stack pointer psp_lo(base) + psp_hi(ind) */
   out->ps = (uc->uc_mcontext.psp_lo & 0xffffffffffff) +
-            (uc->uc_mcontext.psp_hi & 0xffffffff) +
-            2 * ((uint64_t) (((int64_t) (regs->pshtp) <<
-            (64 - E2K_PSHTP_SIZE)) >> (64 - E2K_PSHTP_SIZE)));
+            (uc->uc_mcontext.psp_hi & 0xffffffff);
 }
 
 #endif

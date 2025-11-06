@@ -77,14 +77,12 @@ typedef struct {
   uint64_t    usd_hi;
   uint64_t    psp_lo;
   uint64_t    psp_hi;
-  uint64_t    pshtp;
   uint64_t    cr0_lo;
   uint64_t    cr0_hi;
   uint64_t    cr1_lo;
   uint64_t    cr1_hi;
   uint64_t    pcsp_lo;
   uint64_t    pcsp_hi;
-  uint64_t    pcshtp;
   uint64_t    ps;
   uint64_t    pcs;
 } MDRawContextE2K; /* CONTEXT */

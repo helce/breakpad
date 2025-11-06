@@ -273,9 +273,6 @@ void ThreadInfo::FillCPUContext(RawContextCPU* out) const {
 
 #elif defined(__e2k__)
 
-#define E2K_PCSHTP_SIZE 11
-#define E2K_PSHTP_SIZE 12
-
 uintptr_t ThreadInfo::GetInstructionPointer() const {
   return regs.cr0_hi & 0xfffffffffff8; // [VA_MSB:0] 8-aligned;
 }
@@ -289,23 +286,17 @@ void ThreadInfo::FillCPUContext(RawContextCPU* out) const {
   out->usd_hi = regs.usd_hi;
   out->psp_lo = regs.psp_lo;
   out->psp_hi = regs.psp_hi;
-  out->pshtp = regs.pshtp;
   out->cr0_lo = regs.cr0_lo;
   out->cr0_hi = regs.cr0_hi;
   out->cr1_lo = regs.cr1_lo;
   out->cr1_hi = regs.cr1_hi;
   out->pcsp_lo = regs.pcsp_lo;
   out->pcsp_hi = regs.pcsp_hi;
-  out->pcshtp = regs.pcshtp;
 
-  /* Get chain stack pointer pcsp_lo(base) + pcsp_hi(ind) + signed(pcshtp) */
-  out->pcs = (regs.pcsp_lo & 0xffffffffffff) + (regs.pcsp_hi & 0xffffffff) +
-             ((uint64_t) (((int64_t) (regs.pcshtp) <<
-             (64 - E2K_PCSHTP_SIZE)) >> (64 - E2K_PCSHTP_SIZE)));
-  /* Get procedure stack pointer psp_lo(base) + psp_hi(ind) + 2 * signed(pshtp) */
-  out->ps = (regs.psp_lo & 0xffffffffffff) + (regs.psp_hi & 0xffffffff) +
-            2 * ((uint64_t) (((int64_t) (regs.pshtp) <<
-            (64 - E2K_PSHTP_SIZE)) >> (64 - E2K_PSHTP_SIZE)));
+  /* Get chain stack pointer pcsp_lo(base) + pcsp_hi(ind) */
+  out->pcs = (regs.pcsp_lo & 0xffffffffffff) + (regs.pcsp_hi & 0xffffffff);
+  /* Get procedure stack pointer psp_lo(base) + psp_hi(ind) */
+  out->ps = (regs.psp_lo & 0xffffffffffff) + (regs.psp_hi & 0xffffffff);
 }
   
 #endif
