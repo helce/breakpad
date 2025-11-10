@@ -505,20 +505,20 @@ class MinidumpWriter {
         my_memset(cpu.get(), 0, sizeof(RawContextCPU));
 #if !defined(__ARM_EABI__) && !defined(__mips__) && !defined(__e2k__)
         UContextReader::FillCPUContext(cpu.get(), ucontext_, float_state_);
-#elif defined(__e2k__)
-        user_regs_struct e2k_regs;
-        e2k_regs.sizeof_struct = sizeof(e2k_regs);
-        if (sys_ptrace(PTRACE_GETREGS, thread.thread_id, NULL, &e2k_regs) == -1) {
-          return false;
-        }
-        UContextReader::FillCPUContext(cpu.get(), ucontext_, &e2k_regs);
-        // Copy procedure and chain stacks
-        if (!FillThreadHWStack(&e2k_thread, e2k_regs.proc_stack_base, cpu.get()->ps, true))
-          return false;
-        if (!FillThreadHWStack(&e2k_thread, e2k_regs.chain_stack_base, cpu.get()->pcs, false))
-          return false;
 #else
         UContextReader::FillCPUContext(cpu.get(), ucontext_);
+#endif
+#if defined(__e2k__)
+        // Copy procedure stack
+        uintptr_t psb = UContextReader::GetProcStackBase(ucontext_);
+        uintptr_t psp = UContextReader::GetProcStackPointer(ucontext_, psb);
+        if (!FillThreadHWStack(&e2k_thread, psb, psp, true))
+          return false;
+        // Copy chain stack
+        uintptr_t pcsb = UContextReader::GetChainStackBase(ucontext_);
+        uintptr_t pcsp = UContextReader::GetChainStackPointer(ucontext_, pcsb);
+        if (!FillThreadHWStack(&e2k_thread, pcsb, pcsp, false))
+          return false;
 #endif
         thread.thread_context = cpu.location();
         crashing_thread_context_ = cpu.location();
@@ -542,10 +542,13 @@ class MinidumpWriter {
         my_memset(cpu.get(), 0, sizeof(RawContextCPU));
         info.FillCPUContext(cpu.get());
 #if defined(__e2k__)
-        // Copy procedure and chain stacks
-        if (!FillThreadHWStack(&e2k_thread, info.proc_stack_base, cpu.get()->ps, true))
+        // Copy procedure stack
+        uintptr_t psp = info.GetProcStackPointer();
+        if (!FillThreadHWStack(&e2k_thread, info.proc_stack_base, psp, true))
           return false;
-        if (!FillThreadHWStack(&e2k_thread, info.chain_stack_base, cpu.get()->pcs, false))
+        // Copy chain stack
+        uintptr_t pcsp = info.GetChainStackPointer();
+        if (!FillThreadHWStack(&e2k_thread, info.chain_stack_base, pcsp, false))
           return false;
 #endif
         thread.thread_context = cpu.location();

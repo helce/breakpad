@@ -46,6 +46,16 @@ struct UContextReader {
 
   static uintptr_t GetInstructionPointer(const ucontext_t* uc);
 
+#if defined(__e2k__)
+  static uintptr_t GetProcStackBase(const ucontext_t* uc);
+
+  static uintptr_t GetChainStackBase(const ucontext_t* uc);
+
+  static uintptr_t GetProcStackPointer(const ucontext_t* uc, uintptr_t ps_base);
+
+  static uintptr_t GetChainStackPointer(const ucontext_t* uc, uintptr_t pcs_base);
+#endif
+
   // Juggle a arch-specific ucontext_t into a minidump format
   //   out: the minidump structure
   //   info: the collection of register structures.
@@ -55,9 +65,6 @@ struct UContextReader {
 #elif defined(__aarch64__)
   static void FillCPUContext(RawContextCPU* out, const ucontext_t* uc,
                              const struct fpsimd_context* fpregs);
-#elif defined(__e2k__)
-  static void FillCPUContext(RawContextCPU *out, const ucontext_t* uc,
-                             const struct user_regs_struct* regs);
 #else
   static void FillCPUContext(RawContextCPU* out, const ucontext_t* uc);
 #endif

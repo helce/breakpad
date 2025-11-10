@@ -83,8 +83,6 @@ typedef struct {
   uint64_t    cr1_hi;
   uint64_t    pcsp_lo;
   uint64_t    pcsp_hi;
-  uint64_t    ps;
-  uint64_t    pcs;
 } MDRawContextE2K; /* CONTEXT */
 
 /* This value was chosen to avoid likely conflicts with MD_CONTEXT_*

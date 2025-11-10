@@ -699,8 +699,6 @@ void DumpContext::Print() {
       printf("  cr1_hi              = 0x%" PRIx64 "\n", context_e2k->cr1_hi);
       printf("  pcsp_lo             = 0x%" PRIx64 "\n", context_e2k->pcsp_lo);
       printf("  pcsp_hi             = 0x%" PRIx64 "\n", context_e2k->pcsp_hi);
-      printf("  ps                  = 0x%" PRIx64 "\n", context_e2k->ps);
-      printf("  pcs                 = 0x%" PRIx64 "\n", context_e2k->pcs);
       break;
     }
 

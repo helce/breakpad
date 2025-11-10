@@ -413,13 +413,6 @@ class MicrodumpWriter {
     my_memset(&cpu, 0, sizeof(RawContextCPU));
 #if !defined(__ARM_EABI__) && !defined(__mips__) && !defined(__e2k__)
     UContextReader::FillCPUContext(&cpu, ucontext_, float_state_);
-#elif defined(__e2k__)
-    user_regs_struct e2k_regs;
-    e2k_regs.sizeof_struct = sizeof(e2k_regs);
-    if (sys_ptrace(PTRACE_GETREGS, dumper_->crash_thread(), NULL, &e2k_regs) == -1) {
-      LogLine("Failed to ptrace crashed thread (ERROR)");
-    }
-    UContextReader::FillCPUContext(&cpu, ucontext_, &e2k_regs);
 #else
     UContextReader::FillCPUContext(&cpu, ucontext_);
 #endif

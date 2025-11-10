@@ -258,16 +258,38 @@ void UContextReader::FillCPUContext(RawContextCPU* out, const ucontext_t* uc) {
 #elif defined(__e2k__)
 
 uintptr_t UContextReader::GetStackPointer(const ucontext_t* uc) {
-  return uc->uc_mcontext.usd_lo & 0xffffffffffff; // [rwap base [47: 0]
+  // grows down, so tecnically its base
+  // usd_lo(base [VA_MSB:0])
+  return uc->uc_mcontext.usd_lo & 0xffffffffffff;
 }
 
-/* It's not stack pointer, just stack base to copy mapping. */
 uintptr_t UContextReader::GetInstructionPointer(const ucontext_t* uc) {
-  return uc->uc_mcontext.cr0_hi & 0xfffffffffff8; // [VA_MSB:0] 8-aligned
+  // cr0_hi(ip [VA_MSB:ALIGN_INS])
+  return uc->uc_mcontext.cr0_hi & 0xfffffffffff8;
 }
 
-void UContextReader::FillCPUContext(RawContextCPU* out, const ucontext_t* uc,
-                                    const struct user_regs_struct *regs) {
+uintptr_t UContextReader::GetProcStackBase(const ucontext_t* uc) {
+  // psp_lo(base [VA_MSB:0])
+  return uc->uc_mcontext.psp_lo & 0xffffffffffff;
+}
+
+uintptr_t UContextReader::GetChainStackBase(const ucontext_t* uc) {
+  // pcsp_lo(base [VA_MSB:0])
+  return uc->uc_mcontext.pcsp_lo & 0xffffffffffff;
+}
+
+uintptr_t UContextReader::GetProcStackPointer(const ucontext_t* uc, uintptr_t ps_base) {
+  // psp_lo(base) + psp_hi(ind)
+  return ps_base + (uc->uc_mcontext.psp_hi & 0xffffffff);
+}
+
+uintptr_t UContextReader::GetChainStackPointer(const ucontext_t* uc, uintptr_t pcs_base) {
+  // pcsp_lo(base) + pcsp_hi(ind)
+  return pcs_base + (uc->uc_mcontext.pcsp_hi & 0xffffffff);
+}
+
+
+void UContextReader::FillCPUContext(RawContextCPU* out, const ucontext_t* uc) {
   out->context_flags = MD_CONTEXT_E2K_FULL;
   out->usbr = uc->uc_mcontext.sbr;
   out->usd_lo = uc->uc_mcontext.usd_lo;
@@ -281,16 +303,11 @@ void UContextReader::FillCPUContext(RawContextCPU* out, const ucontext_t* uc,
   out->pcsp_lo = uc->uc_mcontext.pcsp_lo;
   out->pcsp_hi = uc->uc_mcontext.pcsp_hi;
 
-  // Get from user_regs
+  // ucontext doesnot have fields for global registers,
+  // but we can save them to some other undefined field
+  // with the same size, let it be sbbp
   for (int i = 0; i < MD_CONTEXT_E2K_GREGS_COUNT; ++i)
-    out->g[i] = regs->g[i];
-
-  /* Get chain stack pointer pcsp_lo(base) + pcsp_hi(ind) */
-  out->pcs = (uc->uc_mcontext.pcsp_lo & 0xffffffffffff) +
-             (uc->uc_mcontext.pcsp_hi & 0xffffffff);
-  /* Get procedure stack pointer psp_lo(base) + psp_hi(ind) */
-  out->ps = (uc->uc_mcontext.psp_lo & 0xffffffffffff) +
-            (uc->uc_mcontext.psp_hi & 0xffffffff);
+    out->g[i] = uc->uc_mcontext.sbbp[i];
 }
 
 #endif

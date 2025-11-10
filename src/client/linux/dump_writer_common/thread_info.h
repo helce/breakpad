@@ -81,6 +81,14 @@ struct ThreadInfo {
   // Returns the instruction pointer (platform-dependent impl.).
   uintptr_t GetInstructionPointer() const;
 
+#if defined(__e2k__)
+  // Returns procedure stack pointer (e2k-specific).
+  uintptr_t GetProcStackPointer() const;
+
+  // Returns chain stack pointer (e2k-specific).
+  uintptr_t GetChainStackPointer() const;
+#endif
+
   // Fills a RawContextCPU using the context in the ThreadInfo object.
   void FillCPUContext(RawContextCPU* out) const;
 

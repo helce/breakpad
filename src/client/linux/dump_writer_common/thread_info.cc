@@ -274,7 +274,18 @@ void ThreadInfo::FillCPUContext(RawContextCPU* out) const {
 #elif defined(__e2k__)
 
 uintptr_t ThreadInfo::GetInstructionPointer() const {
-  return regs.cr0_hi & 0xfffffffffff8; // [VA_MSB:0] 8-aligned;
+  // cr0_hi(ip [VA_MSB:ALIGN_INS])
+  return regs.cr0_hi & 0xfffffffffff8;
+}
+
+uintptr_t ThreadInfo::GetProcStackPointer() const {
+  // psp_lo(base) + psp_hi(ind)
+  return proc_stack_base + (regs.psp_hi & 0xffffffff);
+}
+
+uintptr_t ThreadInfo::GetChainStackPointer() const {
+  // pcsp_lo(base) + pcsp_hi(ind)
+  return chain_stack_base + (regs.pcsp_hi & 0xffffffff);
 }
 
 void ThreadInfo::FillCPUContext(RawContextCPU* out) const {
@@ -292,11 +303,6 @@ void ThreadInfo::FillCPUContext(RawContextCPU* out) const {
   out->cr1_hi = regs.cr1_hi;
   out->pcsp_lo = regs.pcsp_lo;
   out->pcsp_hi = regs.pcsp_hi;
-
-  /* Get chain stack pointer pcsp_lo(base) + pcsp_hi(ind) */
-  out->pcs = (regs.pcsp_lo & 0xffffffffffff) + (regs.pcsp_hi & 0xffffffff);
-  /* Get procedure stack pointer psp_lo(base) + psp_hi(ind) */
-  out->ps = (regs.psp_lo & 0xffffffffffff) + (regs.psp_hi & 0xffffffff);
 }
   
 #endif
