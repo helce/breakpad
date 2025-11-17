@@ -307,7 +307,7 @@ class MinidumpThread : public MinidumpObject {
   virtual uint64_t GetStartOfProcedureStackRange() const;
 
  protected:
-  explicit MinidumpThread(Minidump* minidump);
+  explicit MinidumpThread(Minidump* minidump, bool ext);
 
  private:
   // These objects are managed by MinidumpThreadList.
@@ -317,8 +317,8 @@ class MinidumpThread : public MinidumpObject {
   // MinidumpThreadList.  No size checking is done, because
   // MinidumpThreadList handles that directly.
   bool Read();
-  bool ReadExtend();
 
+  bool                  thread_extend;
   MDRawThread           thread_;
   MDRawE2kThreadExtend  e2k_thread_;
   MinidumpMemoryRegion* memory_;

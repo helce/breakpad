@@ -405,7 +405,7 @@ class MinidumpWriter {
 
     TypedMDRVA<uint32_t> list(&minidump_writer_);
 #if defined(__e2k__)
-    if (!list.AllocateObjectAndArray(num_threads, sizeof(MDRawThread) + sizeof(MDRawE2kThreadExtend)))
+    if (!list.AllocateObjectAndArray(num_threads, sizeof(MDRawThreadExtend)))
       return false;
 #else
     if (!list.AllocateObjectAndArray(num_threads, sizeof(MDRawThread)))
@@ -563,9 +563,13 @@ class MinidumpWriter {
         }
       }
 
-      list.CopyIndexAfterObject(i, &thread, sizeof(thread));
 #if defined(__e2k__)
-      list.CopyIndexAfterObject(num_threads + i, &e2k_thread, sizeof(e2k_thread));
+      MDRawThreadExtend tmp_thread;
+      tmp_thread.thread = thread;
+      tmp_thread.e2k_thread = e2k_thread;
+      list.CopyIndexAfterObject(i, &tmp_thread, sizeof(tmp_thread));
+#else
+      list.CopyIndexAfterObject(i, &thread, sizeof(thread));
 #endif
     }
 

@@ -382,6 +382,11 @@ typedef struct {
 } MDRawE2kThreadExtend; /* MINIDUMP_THREAD_E2K */
 
 typedef struct {
+  MDRawThread          thread;
+  MDRawE2kThreadExtend e2k_thread;
+} MDRawThreadExtend; /* MINIDUMP_THREAD_EXTEND */
+
+typedef struct {
   uint32_t    number_of_threads;
   MDRawThread threads[1];
 } MDRawThreadList;  /* MINIDUMP_THREAD_LIST */

@@ -88,11 +88,15 @@ StackFrameE2K* StackwalkerE2K::GetCallerByStacks(
   // Read previous cr(0x20), and get ip and stack size from it
   uint64_t cr0_hi, cr1_hi = 0;
   uint64_t previous_cr = last_frame->pcs - 0x20;
+
   if(!chain_stack_->GetMemoryAtAddress(previous_cr + 0x8, &cr0_hi) ||
      !chain_stack_->GetMemoryAtAddress(previous_cr + 0x18, &cr1_hi)) {
     BPLOG(INFO) << " GetMemoryAtAddress for ip failed" ;
     return NULL;
   }
+
+  if (!cr0_hi) return NULL; // End of backtrace
+
   frame->context = last_frame->context;
   frame->context_validity = StackFrameE2K::CONTEXT_VALID_ALL;
   frame->trust = StackFrame::FRAME_TRUST_CF;
