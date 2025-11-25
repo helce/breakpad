@@ -1191,11 +1191,6 @@ bool MinidumpContext::Read(uint32_t expected_size) {
 
         if (minidump_->swap()) {
           // context_e2k->context_flags was already swapped.
-          for (int greg_index = 0;
-               greg_index < MD_CONTEXT_E2K_GREGS_COUNT;
-               ++greg_index) {
-            Swap(&context_e2k->g[greg_index]);
-          }
           Swap(&context_e2k->usbr);
           Swap(&context_e2k->usd_lo);
           Swap(&context_e2k->usd_hi);

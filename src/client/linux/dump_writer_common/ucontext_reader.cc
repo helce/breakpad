@@ -302,12 +302,6 @@ void UContextReader::FillCPUContext(RawContextCPU* out, const ucontext_t* uc) {
   out->cr1_hi = uc->uc_mcontext.cr1_hi;
   out->pcsp_lo = uc->uc_mcontext.pcsp_lo;
   out->pcsp_hi = uc->uc_mcontext.pcsp_hi;
-
-  // ucontext doesnot have fields for global registers,
-  // but we can save them to some other undefined field
-  // with the same size, let it be sbbp
-  for (int i = 0; i < MD_CONTEXT_E2K_GREGS_COUNT; ++i)
-    out->g[i] = uc->uc_mcontext.sbbp[i];
 }
 
 #endif

@@ -552,8 +552,6 @@ ParseThreadRegisters(CrashedProcess::Thread* thread,
   const MDRawContextE2K* rawregs = range.GetData<MDRawContextE2K>(0);
 
   thread->regs.sizeof_struct = sizeof(struct user_regs_struct);
-  for (int i = 0; i < MD_CONTEXT_E2K_GREGS_COUNT; ++i)
-    thread->regs.g[i] = rawregs->g[i];
   thread->regs.usbr = rawregs->usbr;
   thread->regs.usd_lo = rawregs->usd_lo;
   thread->regs.usd_hi = rawregs->usd_hi;

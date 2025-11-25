@@ -682,12 +682,6 @@ void DumpContext::Print() {
       printf("MDRawContextE2K\n");
       printf("  context_flags       = 0x%" PRIx32 "\n",
              context_e2k->context_flags);
-      for (unsigned int greg_index = 0;
-           greg_index < MD_CONTEXT_E2K_GREGS_COUNT;
-           ++greg_index) {
-        printf("  gregs[%2d]            = 0x%" PRIx64 "\n",
-               greg_index, context_e2k->g[greg_index]);
-      }
       printf("  usbr                = 0x%" PRIx64 "\n", context_e2k->usbr);
       printf("  usd_lo              = 0x%" PRIx64 "\n", context_e2k->usd_lo);
       printf("  usd_hi              = 0x%" PRIx64 "\n", context_e2k->usd_hi);

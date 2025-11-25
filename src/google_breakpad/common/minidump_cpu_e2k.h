@@ -71,7 +71,6 @@
 // It is small part of all registers
 typedef struct {
   uint32_t    context_flags;
-  uint64_t    g[MD_CONTEXT_E2K_GREGS_COUNT];
   uint64_t    usbr;
   uint64_t    usd_lo;
   uint64_t    usd_hi;

@@ -290,8 +290,6 @@ uintptr_t ThreadInfo::GetChainStackPointer() const {
 
 void ThreadInfo::FillCPUContext(RawContextCPU* out) const {
   out->context_flags = MD_CONTEXT_E2K_FULL;
-  for (int i = 0; i < MD_CONTEXT_E2K_GREGS_COUNT; ++i)
-    out->g[i] = regs.g[i];
   out->usbr = regs.usbr;
   out->usd_lo = regs.usd_lo;
   out->usd_hi = regs.usd_hi;
