@@ -378,7 +378,11 @@ class MinidumpWriter {
   bool FillThreadHWStack(MDRawE2kThreadExtend* thread, uintptr_t stack_base,
                          uintptr_t stack_pointer, bool is_procedure) {
   uint8_t *stack_copy = NULL;
-  size_t stack_len = stack_pointer - stack_base;
+  // Move the stack pointer to the top of the page that it's in.
+  const uintptr_t page_size = getpagesize();
+  uintptr_t sp = (stack_pointer + (page_size -1)) & ~(page_size - 1);
+
+  size_t stack_len = sp - stack_base;
   UntypedMDRVA memory(&minidump_writer_);
   if (!memory.Allocate(stack_len))
     return false;
